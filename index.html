@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASHIRO — 水面下という哲学</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#04080F;
+  --deep:#071626;
+  --pool:#0A3A6B;
+  --mid:#1565C0;
+  --aqua:#00B4D8;
+  --foam:#90E0EF;
+  --white:#F8FBFF;
+  --red:#E63946;
+  --gold:#F4A261;
+  --glass:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.10);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--ink);
+  color:var(--white);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CUSTOM CURSOR ── */
+.cursor{
+  position:fixed;width:10px;height:10px;
+  border-radius:50%;background:var(--aqua);
+  pointer-events:none;z-index:9999;
+  transition:transform .15s ease;
+  mix-blend-mode:screen;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border-radius:50%;border:1px solid rgba(0,180,216,.5);
+  pointer-events:none;z-index:9998;
+  transition:transform .35s ease, width .3s, height .3s, opacity .3s;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.03;pointer-events:none;z-index:1000;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  padding:28px 60px;
+  display:flex;align-items:center;justify-content:space-between;
+  mix-blend-mode:normal;
+}
+nav::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(4,8,15,.85) 0%,transparent 100%);
+  pointer-events:none;z-index:-1;
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:800;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--white);text-decoration:none;
+  display:flex;align-items:center;gap:14px;
+}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--aqua);}
+.nav-r{display:flex;align-items:center;gap:36px;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{
+  font-family:'Syne',sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(248,251,255,.55);text-decoration:none;
+  transition:color .25s;
+}
+.nav-links a:hover{color:var(--aqua);}
+.nav-btn{
+  font-family:'Syne',sans-serif;
+  font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:10px 22px;
+  border:1px solid var(--aqua);
+  color:var(--aqua);
+  text-decoration:none;border-radius:2px;
+  transition:background .25s,color .25s;
+}
+.nav-btn:hover{background:var(--aqua);color:var(--ink);}
+
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+
+/* animated water bg */
+.hero-water{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 120% 80% at 60% 50%, #0A2A5E 0%, var(--ink) 70%);
+}
+.hero-water canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:.55;
+}
+
+/* diagonal light shaft */
+.light-shaft{
+  position:absolute;
+  top:-20%;right:15%;
+  width:2px;height:140%;
+  background:linear-gradient(180deg,transparent 0%,rgba(0,180,216,.25) 40%,rgba(0,180,216,.05) 100%);
+  transform:rotate(12deg);
+  filter:blur(24px);
+  animation:shaft 6s ease-in-out infinite alternate;
+}
+.light-shaft2{
+  position:absolute;
+  top:-20%;right:30%;
+  width:1px;height:120%;
+  background:linear-gradient(180deg,transparent 0%,rgba(0,180,216,.15) 50%,transparent 100%);
+  transform:rotate(8deg);
+  filter:blur(16px);
+  animation:shaft 8s ease-in-out infinite alternate-reverse;
+}
+@keyframes shaft{
+  0%{opacity:.6;transform:rotate(12deg) scaleX(1);}
+  100%{opacity:1;transform:rotate(14deg) scaleX(1.8);}
+}
+
+.hero-content{
+  position:relative;z-index:5;
+  max-width:1280px;margin:0 auto;
+  padding:140px 80px 100px;
+  display:grid;grid-template-columns:1fr 480px;
+  gap:60px;align-items:center;
+  width:100%;
+}
+.hero-l{}
+
+/* huge display text */
+.hero-sup{
+  font-family:'Syne',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--aqua);margin-bottom:32px;
+  display:flex;align-items:center;gap:14px;
+  opacity:0;animation:fadeUp .8s .1s forwards;
+}
+.hero-sup::before{content:'';width:40px;height:1px;background:var(--aqua);}
+
+.hero-h1{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(52px,6.5vw,96px);
+  line-height:1.05;
+  letter-spacing:-.02em;
+  margin-bottom:36px;
+  opacity:0;animation:fadeUp .9s .25s forwards;
+}
+.hero-h1 .line-aqua{
+  color:var(--aqua);
+  font-style:italic;
+}
+.hero-h1 .line-outline{
+  -webkit-text-stroke:1px rgba(248,251,255,.4);
+  color:transparent;
+}
+
+.hero-desc{
+  font-size:16px;line-height:1.9;
+  color:rgba(248,251,255,.6);font-weight:300;
+  max-width:480px;margin-bottom:48px;
+  opacity:0;animation:fadeUp .8s .45s forwards;
+}
+
+.hero-btns{
+  display:flex;gap:16px;
+  opacity:0;animation:fadeUp .8s .6s forwards;
+}
+.btn-aqua{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;
+  background:var(--aqua);color:var(--ink);
+  font-family:'Syne',sans-serif;font-size:12px;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+  text-decoration:none;border-radius:2px;
+  transition:transform .2s,box-shadow .2s;
+}
+.btn-aqua:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,180,216,.3);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;
+  background:transparent;color:var(--white);
+  font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  text-decoration:none;border:1px solid rgba(248,251,255,.2);
+  border-radius:2px;transition:border-color .2s,color .2s;
+}
+.btn-ghost:hover{border-color:var(--foam);color:var(--foam);}
+
+/* water polo ball animation */
+.hero-r{
+  position:relative;
+  opacity:0;animation:fadeUp .9s .5s forwards;
+  display:flex;align-items:center;justify-content:center;
+}
+.ball-wrap{
+  position:relative;
+  width:360px;height:360px;
+}
+.ball-glow{
+  position:absolute;inset:-40px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,180,216,.2) 0%,transparent 70%);
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1);opacity:.6;}
+  50%{transform:scale(1.15);opacity:1;}
+}
+.ball{
+  position:absolute;inset:0;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.18) 0%, transparent 50%),
+    linear-gradient(135deg,var(--mid) 0%,#0D2B6E 50%,#050E1F 100%);
+  box-shadow:
+    inset -20px -20px 40px rgba(0,0,0,.5),
+    inset 10px 10px 30px rgba(0,100,200,.3),
+    0 30px 80px rgba(0,0,0,.6),
+    0 0 0 1px rgba(255,255,255,.08);
+  animation:float 5s ease-in-out infinite;
+  overflow:hidden;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(0deg);}
+  33%{transform:translateY(-18px) rotate(3deg);}
+  66%{transform:translateY(-8px) rotate(-2deg);}
+}
+
+/* water polo lines on ball */
+.ball::before{
+  content:'';
+  position:absolute;inset:0;border-radius:50%;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,transparent 48px,
+      rgba(255,255,255,.06) 48px,rgba(255,255,255,.06) 50px
+    );
+}
+.ball::after{
+  content:'';
+  position:absolute;
+  left:50%;top:-20%;
+  width:2px;height:140%;
+  background:rgba(255,255,255,.08);
+  transform:rotate(-20deg);
+}
+.ball-lines{
+  position:absolute;inset:0;border-radius:50%;overflow:hidden;
+}
+.ball-line{
+  position:absolute;
+  background:rgba(255,255,255,.07);
+  border-radius:50%;
+}
+.bl1{width:110%;height:30%;top:35%;left:-5%;border:1.5px solid rgba(255,255,255,.08);}
+.bl2{width:40%;height:110%;left:30%;top:-5%;border:1.5px solid rgba(255,255,255,.06);}
+.bl3{
+  width:90%;height:90%;
+  border:1.5px solid rgba(255,255,255,.05);
+  border-radius:50%;
+  top:5%;left:5%;
+}
+
+/* water ripple rings */
+.ring{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(0,180,216,.25);
+  animation:ripple 4s ease-out infinite;
+}
+.ring1{width:420px;height:420px;top:calc(50% - 210px);left:calc(50% - 210px);animation-delay:0s;}
+.ring2{width:500px;height:500px;top:calc(50% - 250px);left:calc(50% - 250px);animation-delay:.8s;}
+.ring3{width:590px;height:590px;top:calc(50% - 295px);left:calc(50% - 295px);animation-delay:1.6s;}
+@keyframes ripple{
+  0%{transform:scale(.85);opacity:.6;}
+  100%{transform:scale(1.1);opacity:0;}
+}
+
+/* depth label */
+.depth-badge{
+  position:absolute;
+  bottom:-30px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;
+  font-family:'Syne',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(0,180,216,.7);
+  white-space:nowrap;
+}
+.depth-badge::before,.depth-badge::after{content:'';width:24px;height:1px;background:rgba(0,180,216,.4);}
+
+/* scroll indicator */
+.scroll-ind{
+  position:absolute;bottom:40px;left:80px;
+  display:flex;align-items:center;gap:14px;
+  font-family:'Syne',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(248,251,255,.35);
+  opacity:0;animation:fadeUp .8s 1.2s forwards;
+  z-index:5;
+}
+.scroll-line{
+  width:1px;height:48px;
+  background:linear-gradient(to bottom,rgba(0,180,216,.6),transparent);
+  animation:scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine{
+  0%{transform:scaleY(0);transform-origin:top;}
+  50%{transform:scaleY(1);transform-origin:top;}
+  51%{transform:scaleY(1);transform-origin:bottom;}
+  100%{transform:scaleY(0);transform-origin:bottom;}
+}
+
+/* ── SURFACE vs DEPTH ── */
+.philosophy{
+  padding:130px 80px;
+  background:var(--ink);
+  position:relative;overflow:hidden;
+}
+.philosophy::before{
+  content:'水';
+  position:absolute;right:-60px;top:50%;transform:translateY(-50%);
+  font-family:'DM Serif Display',serif;
+  font-size:500px;
+  color:rgba(255,255,255,.015);
+  pointer-events:none;user-select:none;
+  line-height:1;
+}
+
+.phil-grid{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:100px;align-items:start;
+}
+.eyebrow{
+  font-family:'Syne',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--aqua);margin-bottom:24px;
+  display:flex;align-items:center;gap:12px;
+}
+.eyebrow::before{content:'';width:32px;height:1px;background:var(--aqua);}
+.big-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(36px,3.8vw,58px);
+  line-height:1.15;
+  margin-bottom:32px;
+}
+.big-title em{font-style:italic;color:var(--aqua);}
+.body-text{
+  font-size:15px;line-height:2;
+  color:rgba(248,251,255,.62);font-weight:300;
+}
+.body-text p{margin-bottom:18px;}
+
+/* split visual */
+.split-vis{
+  position:relative;border-radius:4px;overflow:hidden;
+  height:520px;
+}
+.sv-surface{
+  position:absolute;top:0;left:0;right:0;
+  height:40%;
+  background:linear-gradient(180deg,rgba(21,101,192,.12) 0%,rgba(0,180,216,.18) 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+.sv-waterline{
+  position:absolute;top:40%;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,transparent 0%,var(--aqua) 30%,var(--foam) 50%,var(--aqua) 70%,transparent 100%);
+  filter:blur(.5px);
+  z-index:2;
+}
+.sv-waterline::before{
+  content:'';
+  position:absolute;inset:-8px;
+  background:linear-gradient(90deg,transparent,rgba(0,180,216,.15),transparent);
+  filter:blur(10px);
+}
+.sv-depth{
+  position:absolute;bottom:0;left:0;right:0;
+  height:60%;
+  background:linear-gradient(180deg,rgba(7,22,38,.6) 0%,rgba(4,8,15,.95) 100%);
+  padding:36px 32px;
+}
+.sv-label{
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.sv-label.top{color:rgba(144,224,239,.6);}
+.sv-label.bot{color:rgba(248,251,255,.3);}
+.sv-surface-text{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:var(--foam);
+  text-align:center;
+}
+.depth-items{display:flex;flex-direction:column;gap:12px;}
+.di{
+  display:flex;align-items:flex-start;gap:12px;
+  font-size:13px;color:rgba(248,251,255,.65);line-height:1.6;
+}
+.di-dot{
+  flex-shrink:0;width:4px;height:4px;border-radius:50%;
+  background:var(--aqua);margin-top:7px;
+}
+
+/* ── TIMELINE ── */
+.timeline-s{
+  padding:130px 80px;
+  background:var(--deep);
+  position:relative;
+}
+.timeline-s::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--aqua),transparent);
+}
+.tl-inner{max-width:1100px;margin:60px auto 0;}
+.tl-item{
+  display:grid;grid-template-columns:160px 1fr;
+  gap:40px;
+  padding:48px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .6s,transform .6s;
+}
+.tl-item.vis{opacity:1;transform:none;}
+.tl-item::before{
+  content:'';
+  position:absolute;left:160px;top:0;bottom:0;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(0,180,216,.3),transparent);
+}
+.tl-left{padding-top:6px;text-align:right;padding-right:40px;}
+.tl-year{
+  font-family:'Syne',sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:.12em;
+  color:var(--aqua);margin-bottom:6px;
+}
+.tl-num{
+  font-family:'DM Serif Display',serif;
+  font-size:60px;color:rgba(255,255,255,.04);
+  line-height:1;
+}
+.tl-right{padding-left:40px;}
+.tl-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(20px,2vw,28px);
+  margin-bottom:12px;color:var(--white);
+}
+.tl-body{
+  font-size:14px;line-height:1.9;
+  color:rgba(248,251,255,.58);font-weight:300;
+  max-width:560px;
+}
+.tl-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--aqua);
+}
+.tl-tag::before{content:'';width:16px;height:1px;background:var(--aqua);}
+
+/* ── NUMBERS ── */
+.numbers{
+  padding:100px 80px;
+  background:var(--ink);
+  position:relative;
+}
+.numbers::after{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 80% at 20% 50%, rgba(21,101,192,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 50%, rgba(0,180,216,.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.num-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  max-width:1100px;margin:60px auto 0;
+  gap:1px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.06);
+}
+.num-card{
+  padding:52px 40px;
+  background:var(--ink);
+  position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.num-card:hover{background:rgba(21,101,192,.08);}
+.num-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--aqua),transparent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s;
+}
+.num-card:hover::before{transform:scaleX(1);}
+.nc-n{
+  font-family:'DM Serif Display',serif;
+  font-size:64px;color:var(--white);
+  line-height:1;margin-bottom:10px;
+  letter-spacing:-.02em;
+}
+.nc-n sup{font-size:32px;color:var(--aqua);}
+.nc-label{
+  font-family:'Syne',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(248,251,255,.45);
+}
+
+/* ── ACTIVITIES ── */
+.activities{
+  padding:130px 80px;
+  background:var(--deep);
+  position:relative;overflow:hidden;
+}
+.act-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:24px;
+  max-width:1200px;margin:70px auto 0;
+}
+.act-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  padding:44px 36px;
+  border-radius:3px;
+  position:relative;overflow:hidden;
+  transition:transform .3s,background .3s;
+}
+.act-card:hover{
+  transform:translateY(-6px);
+  background:rgba(255,255,255,.09);
+}
+.act-card.wide{
+  grid-column:span 2;
+  display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;
+}
+.act-card::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--aqua),var(--mid));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s;
+}
+.act-card:hover::after{transform:scaleX(1);}
+.act-num{
+  font-family:'DM Serif Display',serif;
+  font-size:80px;color:rgba(0,180,216,.06);
+  position:absolute;top:-10px;right:20px;
+  line-height:1;pointer-events:none;
+}
+.act-badge{
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--aqua);
+  display:flex;align-items:center;gap:8px;margin-bottom:20px;
+}
+.act-badge::before{content:'';width:20px;height:1px;background:var(--aqua);}
+.act-title{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(20px,2vw,26px);
+  color:var(--white);margin-bottom:14px;line-height:1.3;
+}
+.act-body{
+  font-size:13px;line-height:1.9;
+  color:rgba(248,251,255,.58);font-weight:300;
+}
+.act-stats{display:flex;flex-direction:column;gap:22px;}
+.ast{border-left:2px solid var(--aqua);padding-left:20px;}
+.ast-n{
+  font-family:'DM Serif Display',serif;
+  font-size:44px;color:var(--white);line-height:1;
+}
+.ast-l{font-size:11px;color:rgba(248,251,255,.45);margin-top:4px;letter-spacing:.08em;}
+
+/* ── VOICES ── */
+.voices{
+  padding:130px 80px;
+  background:var(--ink);
+}
+.voices-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;max-width:1100px;margin:70px auto 0;
+}
+.vc{
+  padding:40px 32px;
+  border:1px solid var(--border);
+  border-radius:3px;
+  position:relative;
+  background:var(--glass);
+  transition:transform .3s,border-color .3s;
+}
+.vc:hover{transform:translateY(-4px);border-color:rgba(0,180,216,.3);}
+.vc-q{
+  font-family:'DM Serif Display',serif;
+  font-size:64px;color:rgba(0,180,216,.1);
+  position:absolute;top:16px;left:24px;
+  line-height:1;
+}
+.vc-text{
+  font-size:14px;line-height:1.9;
+  color:rgba(248,251,255,.78);
+  margin-bottom:24px;position:relative;z-index:1;
+  padding-top:10px;
+}
+.vc-from{
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(248,251,255,.38);
+}
+.vc-tag{
+  display:inline-block;margin-top:10px;
+  padding:3px 10px;
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--aqua);border:1px solid rgba(0,180,216,.3);border-radius:2px;
+}
+
+/* ── ATHLETES ── */
+.athletes{
+  padding:130px 80px;
+  background:var(--deep);
+  position:relative;
+}
+.ath-row{
+  display:flex;flex-wrap:wrap;gap:16px;
+  max-width:1100px;margin:70px auto 0;
+}
+.ath{
+  flex:1;min-width:180px;
+  padding:28px 22px;
+  border:1px solid var(--border);
+  border-radius:3px;
+  text-align:center;
+  background:var(--glass);
+  transition:transform .3s,border-color .3s;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .5s,transform .5s,border-color .3s;
+}
+.ath.vis{opacity:1;transform:none;}
+.ath:hover{border-color:rgba(0,180,216,.35);transform:translateY(-4px);}
+.ath-av{
+  width:62px;height:62px;border-radius:50%;
+  margin:0 auto 14px;
+  background:linear-gradient(135deg,var(--pool),var(--aqua));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:22px;color:var(--white);
+  box-shadow:0 0 0 4px rgba(0,180,216,.12);
+}
+.ath-sport{
+  font-family:'Syne',sans-serif;
+  font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--aqua);margin-bottom:5px;
+}
+.ath-name{
+  font-family:'DM Serif Display',serif;
+  font-size:15px;color:var(--white);margin-bottom:4px;
+}
+.ath-note{font-size:11px;color:rgba(248,251,255,.45);line-height:1.5;}
+
+/* ── CTA FULL ── */
+.cta-full{
+  padding:140px 80px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--pool) 0%,#031020 100%);
+  text-align:center;
+}
+.cta-full::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,180,216,.03) 0px,rgba(0,180,216,.03) 1px,transparent 1px,transparent 48px),
+    repeating-linear-gradient(90deg,rgba(0,180,216,.03) 0px,rgba(0,180,216,.03) 1px,transparent 1px,transparent 48px);
+}
+.cta-full .big-title{margin-bottom:24px;position:relative;z-index:1;}
+.cta-full .body-text{
+  max-width:540px;margin:0 auto 48px;position:relative;z-index:1;
+  color:rgba(248,251,255,.65);
+}
+.cta-full .btn-aqua{position:relative;z-index:1;font-size:13px;padding:18px 48px;}
+
+/* ── PROFILE ── */
+.profile{
+  padding:130px 80px;
+  background:var(--ink);
+}
+.profile-grid{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:300px 1fr;gap:80px;align-items:start;
+}
+.prof-card{
+  border:1px solid var(--border);
+  border-radius:3px;padding:44px 32px;
+  background:var(--glass);
+  position:sticky;top:100px;
+  text-align:center;
+}
+.prof-av{
+  width:100px;height:100px;border-radius:50%;
+  margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--red),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:36px;color:var(--white);
+  position:relative;
+}
+.prof-av::after{
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:1px dashed rgba(0,180,216,.3);
+  animation:spin 20s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.prof-en{
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--aqua);margin-bottom:4px;
+}
+.prof-jp{
+  font-family:'DM Serif Display',serif;
+  font-size:20px;color:var(--white);margin-bottom:4px;
+}
+.prof-role{
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(248,251,255,.4);margin-bottom:24px;
+}
+.prof-badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:24px;}
+.pb{
+  font-family:'Syne',sans-serif;
+  font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 10px;border-radius:2px;
+}
+.pb-red{background:rgba(230,57,70,.2);color:#ff8a8a;border:1px solid rgba(230,57,70,.3);}
+.pb-aq{background:rgba(0,180,216,.1);color:var(--aqua);border:1px solid rgba(0,180,216,.25);}
+.prof-row{
+  display:flex;justify-content:space-between;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);
+  font-size:12px;
+}
+.pr-k{color:rgba(248,251,255,.38);}
+.pr-v{color:var(--white);font-weight:700;text-align:right;}
+.prof-right .big-title{margin-bottom:24px;}
+.prof-story{
+  font-size:15px;line-height:2;
+  color:rgba(248,251,255,.62);font-weight:300;
+}
+.prof-story p{margin-bottom:18px;}
+.prof-story strong{color:var(--white);}
+.prof-hl{
+  margin-top:36px;
+  border-left:3px solid var(--aqua);
+  padding:24px 28px;
+  background:rgba(0,180,216,.05);
+}
+.prof-hl p{
+  font-family:'DM Serif Display',serif;
+  font-size:17px;line-height:1.8;
+  color:var(--white);font-style:italic;
+}
+
+/* ── FOOTER ── */
+footer{
+  background:#020609;
+  padding:80px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.foot-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:60px;
+  padding-bottom:50px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.foot-logo{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--white);text-decoration:none;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+}
+.foot-logo span{width:6px;height:6px;border-radius:50%;background:var(--aqua);}
+.foot-desc{font-size:12px;line-height:1.8;color:rgba(248,251,255,.38);}
+.foot-col-t{
+  font-family:'Syne',sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--aqua);margin-bottom:18px;
+}
+.foot-links{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.foot-links a{
+  font-size:13px;color:rgba(248,251,255,.48);
+  text-decoration:none;transition:color .2s;
+}
+.foot-links a:hover{color:var(--white);}
+.foot-bottom{
+  max-width:1100px;margin:32px auto 0;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.foot-copy{font-size:11px;color:rgba(248,251,255,.2);letter-spacing:.04em;}
+
+/* ── UTILS ── */
+.sec-inner{max-width:1200px;margin:0 auto;}
+.tc{text-align:center;}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s;}
+.reveal.vis{opacity:1;transform:none;}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="curR"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <span class="logo-dot"></span>
+    ASHIRO
+  </a>
+  <div class="nav-r">
+    <ul class="nav-links">
+      <li><a href="#phil">哲学</a></li>
+      <li><a href="#story">軌跡</a></li>
+      <li><a href="#act">活動</a></li>
+      <li><a href="#ath">アスリート</a></li>
+      <li><a href="#partner">パートナー</a></li>
+    </ul>
+    <a href="#partner" class="nav-btn">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-water">
+    <canvas id="waterCanvas"></canvas>
+  </div>
+  <div class="light-shaft"></div>
+  <div class="light-shaft2"></div>
+
+  <div class="hero-content">
+    <div class="hero-l">
+      <div class="hero-sup">一般社団法人アスヒロ</div>
+      <h1 class="hero-h1">
+        水面下に<br>
+        <span class="line-aqua">誇り高き</span><br>
+        <span class="line-outline">非効率がある</span>
+      </h1>
+      <p class="hero-desc">
+        華やかな水面の裏で、誰も見ていない戦いを続けてきた。<br>
+        オリンピアンが生きた「水面下の哲学」を、子供たちへ。
+      </p>
+      <div class="hero-btns">
+        <a href="#act" class="btn-aqua">活動を見る →</a>
+        <a href="#phil" class="btn-ghost">哲学を知る</a>
+      </div>
+    </div>
+    <div class="hero-r">
+      <div class="ball-wrap">
+        <div class="ring ring1"></div>
+        <div class="ring ring2"></div>
+        <div class="ring ring3"></div>
+        <div class="ball-glow"></div>
+        <div class="ball">
+          <div class="ball-lines">
+            <div class="ball-line bl1"></div>
+            <div class="ball-line bl2"></div>
+            <div class="ball-line bl3"></div>
+          </div>
+        </div>
+        <div class="depth-badge">水球 Water Polo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy" id="phil">
+  <div class="phil-grid">
+    <div class="reveal">
+      <div class="eyebrow">水面下という哲学</div>
+      <h2 class="big-title">見えないところで<br><em>戦い続ける</em><br>ことの意味</h2>
+      <div class="body-text">
+        <p>水球の試合中、水面下では審判の目が届かない。水着を破られ、首を絞められ、沈められながら、それでも息継ぎのために水面を目指す。</p>
+        <p>人生も同じです。SNSで見える「成功」の裏には、誰も見ていない泥臭い戦いがある。アスヒロはその「水面下の強さ」を、リアルな体験として子供たちに届けます。</p>
+        <p>月8万円で欧州へ渡り、教会に寝泊まりしながら門を叩き続けた日々。その経験があるからこそ、言葉ではなく「背中」で伝えられる。</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="split-vis">
+        <div class="sv-surface">
+          <div>
+            <div class="sv-label top">— 水面上 —</div>
+            <div class="sv-surface-text">メダル・成功・注目・喝采</div>
+          </div>
+        </div>
+        <div class="sv-waterline"></div>
+        <div class="sv-depth">
+          <div class="sv-label bot">— 水面下 —</div>
+          <div class="depth-items">
+            <div class="di"><div class="di-dot"></div>月8万円で欧州へ単身渡航</div>
+            <div class="di"><div class="di-dot"></div>教会に寝泊まりしながら交渉</div>
+            <div class="di"><div class="di-dot"></div>「アジア人は要らない」と笑われ続けた</div>
+            <div class="di"><div class="di-dot"></div>左肩腱板断裂・全治2年の宣告</div>
+            <div class="di"><div class="di-dot"></div>メディアも去り、嘲笑と批判の中で</div>
+            <div class="di"><div class="di-dot"></div>それでも、諦めなかった</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section class="numbers">
+  <div class="sec-inner tc">
+    <div class="eyebrow reveal" style="justify-content:center;">実績</div>
+    <h2 class="big-title reveal">子供たちに届けた<br><em>体験の数</em></h2>
+  </div>
+  <div class="num-grid reveal">
+    <div class="num-card">
+      <div class="nc-n">230<sup>+</sup></div>
+      <div class="nc-label">イベント開催回数</div>
+    </div>
+    <div class="num-card">
+      <div class="nc-n">12,000<sup>+</sup></div>
+      <div class="nc-label">延べ参加者数</div>
+    </div>
+    <div class="num-card">
+      <div class="nc-n">39<sup>校</sup></div>
+      <div class="nc-label">2025年度 訪問校数</div>
+    </div>
+    <div class="num-card">
+      <div class="nc-n">10<sup>+</sup></div>
+      <div class="nc-label">協力アスリート数</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-s" id="story">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="eyebrow reveal">志水祐介の軌跡</div>
+    <h2 class="big-title reveal">不可能と言われた夢を<br><em>泥臭く掴むまで</em></h2>
+    <div class="tl-inner">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-year">中学2年</div>
+          <div class="tl-num">01</div>
+        </div>
+        <div class="tl-right">
+          <h3 class="tl-title">前十字靭帯断裂・水球との出会い</h3>
+          <p class="tl-body">サッカーの夢が断たれ、失意の中で水球へ。「水の中なら自分でも出来る」という小さな成功体験が、すべての始まりになった。</p>
+          <div class="tl-tag">夢の種との出会い</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-year">中学卒業後</div>
+          <div class="tl-num">02</div>
+        </div>
+        <div class="tl-right">
+          <h3 class="tl-title">熊本から埼玉栄高校へ、単身</h3>
+          <p class="tl-body">オリンピアンを目指せる環境を求め、親元を離れ名門校へ。エリートが集う戦場でもまれながら、諦めない心を磨いた。</p>
+          <div class="tl-tag">環境を自ら変える決断</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-year">2012年</div>
+          <div class="tl-num">03</div>
+        </div>
+        <div class="tl-right">
+          <h3 class="tl-title">教員を辞め、月8万円で欧州へ</h3>
+          <p class="tl-body">ロンドン五輪予選敗退後、生徒に「夢を持て」と語っていた自分が諦めようとしている矛盾に気づく。教壇を降り、ラーメン屋でバイトをしながら、教会に寝泊まりして欧州チームの門を叩き続けた。</p>
+          <div class="tl-tag">言葉より背中で語る</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-year">2016年</div>
+          <div class="tl-num">04</div>
+        </div>
+        <div class="tl-right">
+          <h3 class="tl-title">リオ五輪・日本代表主将として出場</h3>
+          <p class="tl-body">ハンガリーのプロチームでアジア人初のキャプテンに就任。32年間閉ざされていたオリンピックへの扉を、主将として開いた。</p>
+          <div class="tl-tag">32年ぶりの扉を開く</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-year">2019年</div>
+          <div class="tl-num">05</div>
+        </div>
+        <div class="tl-right">
+          <h3 class="tl-title">左肩腱板断裂・全治2年の宣告</h3>
+          <p class="tl-body">東京五輪2年前、選手生命を脅かす大怪我。メディアも去り、嘲笑と批判の中でも「やらなかった後悔だけはしたくない」という一心で立ち向かった。</p>
+          <div class="tl-tag">絶望からの再起</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-year">2021年</div>
+          <div class="tl-num">06</div>
+        </div>
+        <div class="tl-right">
+          <h3 class="tl-title">1年前倒し復帰・東京五輪出場</h3>
+          <p class="tl-body">テーピングぐるぐる巻きで日本選手権を制し、再び五輪の舞台へ。「壁は超えられる」を、自らの身体で証明した。</p>
+          <div class="tl-tag">2度目のオリンピック</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTIVITIES -->
+<section class="activities" id="act">
+  <div class="sec-inner">
+    <div class="eyebrow reveal">私たちの活動</div>
+    <h2 class="big-title reveal">本物のオリンピアンを<br><em>すべての子供たちのもとへ</em></h2>
+    <div class="act-grid">
+      <div class="act-card wide reveal">
+        <div>
+          <div class="act-badge">子供向け・メイン事業</div>
+          <h3 class="act-title">学校・地域への<br>オリンピアン派遣授業</h3>
+          <p class="act-body">8競技のオリンピック選手が、小中学校・行政主催イベントへ直接出向く。武蔵野市・西東京市・新宿区など多数の自治体と連携。ミズノ株式会社・テレビ朝日とも共同実施。<br><br>「上手くなければ意味がない」ではなく、「やってみる楽しさ」を届ける。</p>
+        </div>
+        <div class="act-stats">
+          <div class="ast">
+            <div class="ast-n">98h</div>
+            <div class="ast-l">2025年度 授業時間</div>
+          </div>
+          <div class="ast">
+            <div class="ast-n">39校</div>
+            <div class="ast-l">2025年度 訪問校数</div>
+          </div>
+          <div class="ast">
+            <div class="ast-n">4,025名</div>
+            <div class="ast-l">2025年度 参加者</div>
+          </div>
+        </div>
+        <div class="act-num">01</div>
+      </div>
+      <div class="act-card reveal">
+        <div class="act-badge">大人向け</div>
+        <h3 class="act-title">アスリート×<br>ビジネス研修</h3>
+        <p class="act-body">「逆境のリーダーシップ」「諦めない組織文化」をテーマに、オリンピアンが企業研修の講師として登壇。水面下で培った哲学は、ビジネスの現場に直接響く。</p>
+        <div class="act-num">02</div>
+      </div>
+      <div class="act-card reveal">
+        <div class="act-badge">地域連携</div>
+        <h3 class="act-title">スポーツ体験会・<br>地域イベント</h3>
+        <p class="act-body">渋谷こども食堂・秋田こども福祉施設・京都サマーアクアフェスなど多様な場で展開。子供から大人まで、スポーツの力を届ける。</p>
+        <div class="act-num">03</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VOICES -->
+<section class="voices">
+  <div class="sec-inner">
+    <div class="eyebrow tc reveal" style="justify-content:center;">参加者の声</div>
+    <h2 class="big-title tc reveal">体験した子供・保護者より</h2>
+    <div class="voices-grid">
+      <div class="vc reveal">
+        <div class="vc-q">"</div>
+        <p class="vc-text">スポーツが苦手でコンプレックスだった娘が、授業のあとに「また行きたい！」と言った。諦めずにやってみることを、身体で感じてくれたようです。</p>
+        <div class="vc-from">保護者・40代女性</div>
+        <div class="vc-tag">小学校派遣授業</div>
+      </div>
+      <div class="vc reveal">
+        <div class="vc-q">"</div>
+        <p class="vc-text">オリンピックに出た選手が、僕と同じ目線で話しかけてくれた。なんか、自分もできる気がした。夢ってあっていいんだと思った。</p>
+        <div class="vc-from">小学5年生・男子</div>
+        <div class="vc-tag">体験イベント参加</div>
+      </div>
+      <div class="vc reveal">
+        <div class="vc-q">"</div>
+        <p class="vc-text">授業参観よりもいきいきした顔を見ました。失敗しても笑って次に挑戦する姿に、親のほうが学ばされました。こんな機会をもっと増やしてほしい。</p>
+        <div class="vc-from">保護者・30代男性</div>
+        <div class="vc-tag">武蔵野市 土曜学校</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ATHLETES -->
+<section class="athletes" id="ath">
+  <div class="sec-inner">
+    <div class="eyebrow reveal">アスリートネットワーク</div>
+    <h2 class="big-title reveal">子供たちのもとへ届ける<br><em>本物の仲間たち</em></h2>
+    <div class="ath-row">
+      <div class="ath"><div class="ath-av">志</div><div class="ath-sport">水球</div><div class="ath-name">志水 祐介</div><div class="ath-note">リオ・東京オリンピアン<br>アスヒロ代表</div></div>
+      <div class="ath"><div class="ath-av">亀</div><div class="ath-sport">体操</div><div class="ath-name">亀山 耕平</div><div class="ath-note">東京オリンピアン</div></div>
+      <div class="ath"><div class="ath-av">荒</div><div class="ath-sport">シンクロ</div><div class="ath-name">荒井 美帆</div><div class="ath-note">リオ五輪銀メダリスト</div></div>
+      <div class="ath"><div class="ath-av">吉</div><div class="ath-sport">水球</div><div class="ath-name">吉田 拓馬</div><div class="ath-note">東京オリンピアン</div></div>
+      <div class="ath"><div class="ath-av">有</div><div class="ath-sport">水球</div><div class="ath-name">有馬 優美</div><div class="ath-note">東京オリンピアン</div></div>
+      <div class="ath"><div class="ath-av">小</div><div class="ath-sport">バスケット</div><div class="ath-name">小林 慎太郎</div><div class="ath-note">熊本ヴォルターズ<br>オールスターMVP</div></div>
+      <div class="ath"><div class="ath-av">坂</div><div class="ath-sport">カバディ</div><div class="ath-name">坂本 夏実</div><div class="ath-note">現役日本代表<br>キャプテン</div></div>
+      <div class="ath"><div class="ath-av">池</div><div class="ath-sport">ラクロス</div><div class="ath-name">池川 健</div><div class="ath-note">日本代表選手</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-full" id="partner">
+  <div class="eyebrow reveal" style="justify-content:center;">パートナーシップ</div>
+  <h2 class="big-title reveal">子供たちの未来を<br><em>一緒に創りませんか</em></h2>
+  <div class="body-text reveal">
+    <p>「スポンサー」ではなく、夢を共に追う仲間として。さいたま市内の学校への販路開拓・協賛・研修提供など、様々な形で連携できます。</p>
+    <p style="margin-top:16px;font-size:17px;color:var(--white);font-style:italic;font-family:'DM Serif Display',serif;">「名刺を100枚持って来ました。私は本気です。夢はあきらめません。」— 志水 祐介</p>
+  </div>
+  <a href="mailto:info@ashiro.or.jp" class="btn-aqua reveal">お問い合わせ・ご相談 →</a>
+</section>
+
+<!-- PROFILE -->
+<section class="profile">
+  <div class="profile-grid">
+    <div class="prof-card reveal">
+      <div class="prof-av">志</div>
+      <div class="prof-en">Yusuke Shimizu</div>
+      <div class="prof-jp">志水 祐介</div>
+      <div class="prof-role">代表 / Founder</div>
+      <div class="prof-badges">
+        <span class="pb pb-red">2x Olympian</span>
+        <span class="pb pb-aq">リオ主将</span>
+        <span class="pb pb-aq">アジア人初</span>
+      </div>
+      <div>
+        <div class="prof-row"><span class="pr-k">出身</span><span class="pr-v">熊本県</span></div>
+        <div class="prof-row"><span class="pr-k">生年</span><span class="pr-v">1988年</span></div>
+        <div class="prof-row"><span class="pr-k">競技</span><span class="pr-v">水球</span></div>
+        <div class="prof-row"><span class="pr-k">五輪</span><span class="pr-v">リオ(主将)・東京</span></div>
+        <div class="prof-row"><span class="pr-k">海外</span><span class="pr-v">豪・伊・洪・セルビア</span></div>
+        <div class="prof-row"><span class="pr-k">設立</span><span class="pr-v">2022年10月</span></div>
+      </div>
+    </div>
+    <div class="prof-right reveal">
+      <div class="eyebrow">代表メッセージ</div>
+      <h2 class="big-title" style="font-size:clamp(28px,3vw,44px);">泥臭く生きてきたから<br><em>子供たちに届けられる</em></h2>
+      <div class="prof-story">
+        <p>私の人生は、逆境の連続でした。中学で靭帯を切り、熊本から一人で埼玉へ出て、ロンドン五輪予選で敗れ、教員を辞め、月8万円でラーメン屋をしながら欧州へ渡り、教会に泊まりながらチームの門を叩き続けた。</p>
+        <p>「アジアの水球選手なんていらない」と何度も笑われた。<strong>181cmの私は「子どもが体験入部に来た」と鼻で笑われた。</strong>それでも諦めなかったのは、生徒たちに「夢を持て」と言い続けた自分が、環境のせいにして諦める大人になれなかったから。</p>
+        <p>2度のオリンピックを経験した今、私が最も誇れることは記録でも金メダルでもない。<strong>どんな逆境でも、言い訳せずに泥臭く這い上がってきたこと。</strong>それだけです。</p>
+      </div>
+      <div class="prof-hl">
+        <p>「かつて中学生の私が『水の中なら自分でも出来る』と感じたあの瞬間が、すべての始まりだった。子供たちに、その最初の一歩を届けたい。それが今の私の夢です。」</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div>
+      <a href="#" class="foot-logo"><span></span>ASHIRO</a>
+      <p class="foot-desc">スポーツを通じて、人がもっと豊かになれる社会を創る。一般社団法人アスヒロは、オリンピアンの力を子供たちと社会に還元します。</p>
+    </div>
+    <div>
+      <div class="foot-col-t">Navigation</div>
+      <ul class="foot-links">
+        <li><a href="#phil">水面下という哲学</a></li>
+        <li><a href="#story">志水祐介の軌跡</a></li>
+        <li><a href="#act">活動内容</a></li>
+        <li><a href="#ath">アスリートネットワーク</a></li>
+        <li><a href="#partner">パートナーシップ</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="foot-col-t">Contact</div>
+      <p style="font-size:12px;color:rgba(248,251,255,.38);line-height:1.8;margin-bottom:20px;">一般社団法人アスヒロ<br>代表 志水 祐介</p>
+      <a href="#partner" class="btn-aqua" style="font-size:11px;padding:12px 24px;display:inline-flex;">お問い合わせ →</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <div class="foot-copy">© 2024 一般社団法人アスヒロ. All rights reserved.</div>
+    <div class="foot-copy">水面下という哲学 — 夢はあきらめない</div>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx-5+'px';cur.style.top=my-5+'px';
+});
+function animCursor(){
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  curR.style.left=rx-18+'px'; curR.style.top=ry-18+'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{curR.style.width='56px';curR.style.height='56px';curR.style.opacity='.5';});
+  el.addEventListener('mouseleave',()=>{curR.style.width='36px';curR.style.height='36px';curR.style.opacity='1';});
+});
+
+// WATER CANVAS
+const canvas=document.getElementById('waterCanvas');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+const waves=[];
+for(let i=0;i<5;i++){
+  waves.push({
+    amp:30+i*12,
+    freq:0.003+i*0.0008,
+    speed:0.0006+i*0.0003,
+    phase:i*Math.PI/3,
+    y:0.3+i*0.12,
+    alpha:0.06-i*0.008,
+    color:`rgba(${20+i*8},${100+i*15},${200+i*8},`
+  });
+}
+
+let t=0;
+function drawWater(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  waves.forEach(w=>{
+    ctx.beginPath();
+    const baseY=canvas.height*w.y;
+    ctx.moveTo(0,baseY);
+    for(let x=0;x<=canvas.width;x+=4){
+      const y=baseY+Math.sin(x*w.freq+t*w.speed+w.phase)*w.amp
+               +Math.sin(x*w.freq*1.7+t*w.speed*1.3)*w.amp*.4;
+      ctx.lineTo(x,y);
+    }
+    ctx.lineTo(canvas.width,canvas.height);
+    ctx.lineTo(0,canvas.height);
+    ctx.closePath();
+    ctx.fillStyle=w.color+w.alpha+')';
+    ctx.fill();
+
+    // glint line
+    ctx.beginPath();
+    ctx.moveTo(0,canvas.height*w.y);
+    for(let x=0;x<=canvas.width;x+=4){
+      const y=baseY+Math.sin(x*w.freq+t*w.speed+w.phase)*w.amp
+               +Math.sin(x*w.freq*1.7+t*w.speed*1.3)*w.amp*.4;
+      ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=`rgba(144,224,239,${w.alpha*1.5})`;
+    ctx.lineWidth=1;
+    ctx.stroke();
+  });
+  t++;
+  requestAnimationFrame(drawWater);
+}
+drawWater();
+
+// SCROLL REVEAL
+const io=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('vis'),i*80);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll('.reveal,.tl-item,.ath').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
